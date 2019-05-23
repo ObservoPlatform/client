@@ -20,6 +20,7 @@ html {
     left: 0;
     padding: 10px;
     height: 100%;
+    z-index: 10;
     transition: transform 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
     transform: translateX(-100px);
 }
@@ -37,6 +38,7 @@ html {
     right: 0;
     padding: 10px;
     height: 100%;
+    z-index: 10;
     transition: transform 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
     transform: translateX(100px);
 }
@@ -50,6 +52,32 @@ html {
 body {
     background: gray;
 }
+
+
+.avatar {
+    padding: 6px;
+    .icon {
+        transform: scale(1);
+        transition: all .2s ease-in-out;
+        cursor: pointer;
+        &:hover {
+            transform: scale(1.08);
+        }
+        .base {
+            padding: 3px;
+            width: 48px;
+            width: 48px;
+            height: 48px;
+            border-radius: 5px;
+            background: #eee;
+            display: inline-block;
+        }
+    }
+}
+
+
+
+
 .portal {
     transition: opacity 1s, width 2s;
 
@@ -60,6 +88,15 @@ body {
                 transform: translate3d(-5px, 0px, 0px);
                 filter: brightness(90%);
             }
+        }
+    }
+    .group-sidebar {
+        &::-webkit-scrollbar-thumb {
+            background: #191919;
+        }
+        &::-webkit-scrollbar-track {
+            -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+            background-color: #F5F5F5;
         }
     }
     .avatar {
@@ -101,7 +138,7 @@ body {
     }
     .sidebar-right-popout {
         margin-left: 10px;
-        transition: width 1s;
+        transition: width 0.7s;
         overflow: auto;
         border-radius: 10px;
         &::-webkit-scrollbar { 
@@ -134,7 +171,6 @@ body {
         padding: 3px;
         margin-right: 10px;
     }
-
     &::-webkit-scrollbar-thumb {
         background: gray;
     }

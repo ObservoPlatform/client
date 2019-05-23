@@ -51,9 +51,9 @@ export default class Home extends Component {
             top = top - 50
         }
         return <Grid canvas col>
-            <Grid background="gray" row center v style={{ overflowY: "" }} className="home">
+            <Grid background="gray" row center h className="home">
                 <Fixed media={this.props.media} state={this.props.state} />
-                <Grid row width="100%" style={{ transform: `translate3d(0px , ${top}px, 0px)` }} className="area">
+                <Grid row width="100%" style={{ transform: `translate3d(0px , ${top}px, 0px)` }} className="area" height={300}>
                     <Observo />
                     <Loading state={this.props.state} />
                     <Account state={this.props.state} />

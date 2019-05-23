@@ -10,6 +10,7 @@ import io from 'socket.io-client'; //Socket client
 
 //Home
 import Home from "./views/home/Home"
+import Project from "./views/project/Project"
 
 //CSS
 import '../node_modules/antd/dist/antd.css';
@@ -47,13 +48,17 @@ class Viewer extends Component {
     }
 }
 
-
+/**
+ * App - Main App of Observo and it runs on code
+ */
 class App extends Component {
     constructor() {
         super()
         this.unsub = [];
         this.state = {
-            state: "LOADING" //Visual State
+            homeState: "LOADING", //Visual State
+            projectState: "MAIN",
+            state: "HOME"
         }
     }
     componentDidMount() {
@@ -78,7 +83,7 @@ class App extends Component {
                     duix.set('home_setTop', 80) //Animation of the gome
                     this.coreSocket.emit("projects_getAll") //Now lets get projects
                    
-                    this.setState({ state: "PORTAL" })
+                    this.setState({ homeState: "PORTAL" })
                  
                 }
             })
@@ -105,7 +110,7 @@ class App extends Component {
 * @param {String} state
         */
     _updateVisualState(state) {
-        this.setState({ state })
+        this.setState({ homeState: state })
     }
     /**
      * _onLogOutStart - Event for when the USER ATTEMPTS to logout. 
@@ -127,12 +132,19 @@ class App extends Component {
             });
         }
     }
+    renderPages(media) {
+        if (this.state.state == "HOME") {
+            return <Home media={media} state={this.state.homeState} />
+        } else if (this.state.state = "PROJECT") {
+            return <Project media={media} state={this.state.projectState} />
+        }
+    }
     /////////////////////
     render() {
         return <MediaQuery>
             {media => (
                 <div>
-                    <Home media={media} state={this.state.state} />
+                    {this.renderPages(media)}
                 </div>
             )}
         </MediaQuery>

@@ -47,9 +47,9 @@ export default class CreateGroup extends Component {
         this.state = {
             current: 1,
             steps: [
-                { title: "Create", icon: "user" },
-                { title: "Invite Users", icon: "usergroup-add" },
-                { title: "Launch", icon: "rocket" },
+                { title: "Name", icon: "user" },
+                { title: "Invite", icon: "usergroup-add" },
+                { title: "Create", icon: "rocket" },
             ],
             stepCreate_isGroup: false,
 
@@ -82,7 +82,7 @@ export default class CreateGroup extends Component {
             let current = this.state.current - 1
             this.setState({ current })
             if (current == 1) {
-                this.setState({stepCreate_isGroup: false})
+                this.setState({ stepCreate_isGroup: false })
             }
         }
 
@@ -90,8 +90,8 @@ export default class CreateGroup extends Component {
     ////////////////////////////
     stepCreate() {
         if (this.state.current == 1) {
-            return <Grid height={50} center v style={{ margin: 30 }}>
-                <Grid style={{ textAlign: "center" }}><h1>Create Group</h1></Grid>
+            return <Grid height={50} center h style={{ margin: 30 }}>
+                <Grid style={{ textAlign: "center" }}><h1>Name Group</h1></Grid>
                 <Grid width={300}>
                     <SearchChecker
                         value={this.state.stepCreate_value}
@@ -128,46 +128,51 @@ export default class CreateGroup extends Component {
         this.setState({ stepCreate_isGroup: false, stepCreate_value: event.currentTarget.value })
     }
     /////////////////
+    renderInvited(remove) {
+        //Get the invited people to the group
+        let items = []
+
+        //Loop all invited (from state)
+        for (let key in this.state.stepCreate_invited) {
+            //Get the username
+            let username = this.state.stepCreate_invited[key]
+            //Create a function to remove the user when clicekd
+            let removeUser = () => {
+                let invited = this.state.stepCreate_invited
+                delete invited[key]
+                this.setState({ stepCreate_invited: invited })
+            }
+            //Now push all of the outline for the invited into an array
+            let useRemove = <Grid width={50} style={{ padding: 10 }}>
+                <Button onClick={removeUser} type="danger" shape="circle" icon="cross" size="small" />
+            </Grid>
+            if (remove == false) {
+                useRemove = null
+            }
+            items.push(<Grid col height={60}>
+                <Grid width={50}>
+                    {userIcon(key)}
+                </Grid>
+                <Grid style={{ paddingTop: 10 }}>
+                    {username}
+                </Grid>
+                {useRemove}
+            </Grid>)
+        }
+        //If the array is empty, display a message
+        if (items.length == 0) {
+            items.push(<Grid col height={60}>
+                <Grid style={{ paddingTop: 10, textAlign: "center" }}>
+                    <p style={{ color: "gray" }}> No Users Invited Yet :(</p>
+                </Grid>
+            </Grid>)
+        }
+        //Return the array of invited people (or not)
+        return items
+    }
     stepInvite() {
 
-        let renderInvited = () => {
-            //Get the invited people to the group
-            let items = []
 
-            //Loop all invited (from state)
-            for (let key in this.state.stepCreate_invited) {
-                //Get the username
-                let username = this.state.stepCreate_invited[key]
-                //Create a function to remove the user when clicekd
-                let removeUser = () => {
-                    let invited = this.state.stepCreate_invited
-                    delete invited[key]
-                    this.setState({ stepCreate_invited: invited })
-                }
-                //Now push all of the outline for the invited into an array
-                items.push(<Grid col height={60}>
-                    <Grid width={50}>
-                        {userIcon(key)}
-                    </Grid>
-                    <Grid style={{ paddingTop: 10 }}>
-                        {username}
-                    </Grid>
-                    <Grid width={50} style={{ padding: 10 }}>
-                        <Button onClick={removeUser} type="danger" shape="circle" icon="cross" size="small" />
-                    </Grid>
-                </Grid>)
-            }
-            //If the array is empty, display a message
-            if (items.length == 0) {
-                items.push(<Grid col height={60}>
-                    <Grid style={{ paddingTop: 10, textAlign: "center" }}>
-                        <p style={{ color: "gray" }}> No Users Invited Yet :(</p>
-                    </Grid>
-                </Grid>)
-            }
-            //Return the array of invited people (or not)
-            return items
-        }
         if (this.state.current == 2) {
             //Return the main render for the INVITE Step
             return <Grid style={{ margin: 30 }} row>
@@ -184,16 +189,17 @@ export default class CreateGroup extends Component {
                             onSelect={this.stepInvite_onSelect.bind(this)}
                             time={300}
                         />
-                    </Grid>  
+                    </Grid>
                     <Grid style={{ borderRight: "3px solid lightgray" }} />
                     <Grid row style={{ marginLeft: 10 }}>
                         <Grid className="scrollY" row height={270} width={320} style={{ overflowY: 'auto', overflow: "overlay" }}>
-                            {renderInvited()}
+                            {this.renderInvited(true)}
                         </Grid>
                     </Grid>
                 </Grid>
             </Grid>
         }
+
         return null
     }
     async stepInvite_onUserSearch(search) {
@@ -269,9 +275,35 @@ export default class CreateGroup extends Component {
             this.setState({ stepCreate_invited: invited })
         }
     }
-    /////////////////////
+    stepCreate_create() {
+        let members = []
+        for (let uuid in this.state.stepCreate_invited) {
+            members.push(uuid)
+        }
+        console.log(members)
+        this.coreSocket.emit("group_create", {name: this.state.stepCreate_value, members })
+    }
+    // ???
     stepLaunch() {
-
+        if (this.state.current == 3) {
+            //Return the main render for the INVITE Step
+            return <Grid style={{ margin: 30 }} row>
+                <Grid col>
+                    <Grid row style={{ marginRight: 10 }}>
+                        <Grid center h v style={{ textAlign: "center" }}><h1>{this.state.stepCreate_value}</h1></Grid>
+                        <Grid center h v><Button onClick={this.stepCreate_create.bind(this)} style={{ fontSize: 30, fontWeight: "bold", height: 70 }} type="primary">Create</Button></Grid>                    
+                    </Grid>
+                    <Grid width={10} style={{ borderRight: "3px solid lightgray" }} />
+                    <Grid row style={{ marginLeft: 10 }} width={150}>
+                        
+                        <Grid className="scrollY" row height={270} width={150} style={{ overflowY: 'auto', overflow: "overlay" }}>
+                            {this.renderInvited(false)}
+                        </Grid>
+                    </Grid>
+                </Grid>
+            </Grid>
+        }
+        return null
     }
     onClose() {
         if (this.props.onClose) {
@@ -295,7 +327,7 @@ export default class CreateGroup extends Component {
             onBack={this.onBack.bind(this)}
             nextDisabled={!this.state.stepCreate_isGroup}
             current={this.state.current}
-            title="Create Group"
+            title="New Group"
             text={["Cancel", "Next"]}
         >
             {this.stepCreate()}

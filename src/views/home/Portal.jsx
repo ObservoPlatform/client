@@ -25,12 +25,13 @@ export default class Portal extends Component {
             username: "master",
             uuid: null,
 
-
             panelState: "home",
             groupUUID: "",
             groupName: "Jello",
-            
+
             sidebarRightPopout: false,
+
+            projects: []
 
         }
     }
@@ -48,6 +49,11 @@ export default class Portal extends Component {
      */
     _onConnect(client) {
         this.coreSocket = client
+        this.coreSocket.on("group_projects", () => {
+            if (data.hasPropertyKey("projects")) {
+                self.setState({ projects: data.projects })
+            }
+        })
     }
     /**
     * onSetUsername - Sets the username of the current authenticated user.
@@ -79,13 +85,13 @@ export default class Portal extends Component {
     }
 
     _onUserHomeSelect() {
-        this.setState({panelState: "home"})
+        this.setState({ panelState: "home" })
     }
     /////////////////////
     renderGroupSidebar() {
-        return <GroupSidebar 
-        onHomeSelect={this._onUserHomeSelect.bind(this)}
-        onGroupSelect={(uuid) => {  this.setState({panelState: uuid})}}
+        return <GroupSidebar
+            onHomeSelect={this._onUserHomeSelect.bind(this)}
+            onGroupSelect={(uuid) => { this.setState({ panelState: uuid, projects: [] }) }}
         />
     }
     renderButtonSidebar() {
@@ -137,11 +143,11 @@ export default class Portal extends Component {
         }
         return <Grid col style={style} height={500} className="sidebar-right-popout" background="#a8a8a8">
             <Grid row>
-                <Grid col height={62} className="center" background="#191919">
+                <Grid col height={62} background="#191919">
                     <Grid><p style={{ fontSize: 24, color: "white", paddingTop: 5 }}>Users</p></Grid>
                 </Grid>
-                <Grid row style={{padding: 5}}>
-                    <UserSearch style={{width: "100%"}} />
+                <Grid row style={{ padding: 5 }}>
+                    <UserSearch style={{ width: "100%" }} />
                 </Grid>
             </Grid>
         </Grid>
@@ -149,9 +155,9 @@ export default class Portal extends Component {
     }
     renderPanel() {
         if (this.state.panelState == "home") {
-            return <UserHomePanel username={this.state.username} uuid={this.state.uuid}/>
+            return <UserHomePanel username={this.state.username} uuid={this.state.uuid} />
         } else {
-            return <GroupPanel name={this.state.name}/>;
+            return <GroupPanel name={this.state.name} projects={this.state.projects} />;
         }
     }
     /////////////////////////////////////

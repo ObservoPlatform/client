@@ -40,8 +40,8 @@ export default class UserHomePanel extends Component {
                                 </Badge>
                             </Dropdown>
                         </Grid>
-                        <Grid row width={100}>
-                            <Grid><p style={{ fontSize: 18, color: "white", paddingTop: 5 }}>{this.props.username}</p></Grid>
+                        <Grid row width={100} style={{paddingLeft: 4}} >
+                            <Grid><p style={{ fontSize: 18, color: "white", paddingTop: 8 }}>{this.props.username}</p></Grid>
                         </Grid>
                     </Grid>
                     <Grid row>
