@@ -4,7 +4,7 @@
   "description": "Observo's Client",
   "main": "main.js",
   "scripts": {
-    "start": "parcel src/index.html --out-dir ./dist "
+    "start": "parcel src/index.html --out-dir ./dist"
   },
   "author": "ImportProgram",
   "license": "MIT",
@@ -13,26 +13,13 @@
     "ant": "^0.2.0",
     "antd": "^3.13.0",
     "duix": "^1.0.5",
-    "electron": "^4.0.5",
-    "fs-extra": "^7.0.1",
-    "import-window": "^1.0.2",
-    "page": "^1.11.0",
     "react": "^16.7.0",
     "react-desktop": "^0.3.7",
     "react-dom": "^16.7.0",
     "react-draggable": "^3.3.0",
+    "regenerator-runtime": "^0.13.2",
     "socket.io-client": "^2.2.0",
     "store": "^2.0.12"
-  },
-  "devDependencies": {
-    "babel-core": "^6.26.3",
-    "babel-plugin-transform-async-to-generator": "^6.24.1",
-    "babel-plugin-transform-object-rest-spread": "^6.26.0",
-    "babel-plugin-transform-runtime": "^6.23.0",
-    "babel-preset-env": "^1.7.0",
-    "babel-preset-react": "^6.24.1",
-    "less": "^3.9.0",
-    "postcss-modules": "^1.4.1"
   },
   "alias": {
     "o-grid": "./lib/grid.jsx",
