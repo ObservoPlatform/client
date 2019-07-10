@@ -33,12 +33,12 @@ export default class GroupSidebar extends Component {
         this.coreSocket = client
     }
     _onAuth() {
-        this.coreSocket.on("groups_list", (data) => {
+        this.coreSocket.on("groups/list", (data) => {
             let groups = true ? data.groups : null
             console.log(groups)
             this.setState({ groups })
         })
-        this.coreSocket.emit("groups_list")
+        this.coreSocket.emit("groups/list")
     }
     _showCreateGroup() {
         this.setState({ modal_createGroup: true })
@@ -65,7 +65,7 @@ export default class GroupSidebar extends Component {
             this.props.onGroupSelect(uuid)
         }
         this.setState({ selected: uuid })
-        this.coreSocket.emit("group_select", { uuid })
+        this.coreSocket.emit("group/select", { uuid })
         duix.set("home_groupSelect", { uuid, name })
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -116,7 +116,7 @@ export default class GroupSidebar extends Component {
                     </Tooltip>
                 </Grid>
             </Grid>
-            <Grid row scrollY width={62} background="gray" className="group-sidebar" height={380}>
+            <Grid row scrollY width={62} background="a8a8a8" className="group-sidebar" height={380}>
                 {this.renderGroups()}
             </Grid>
             <Grid className="avatar" background="a8a8a8" style={{ padding: 5}}>

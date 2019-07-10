@@ -48,7 +48,7 @@ export default class Messenger extends Component {
     /////////////////////
     render() {
         return <Drawer
-            title="Messeger"
+            title="Messenger"
             placement="right"
             closable={true}
             onClose={this.onMessengerClose.bind(this)}

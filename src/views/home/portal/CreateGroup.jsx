@@ -111,13 +111,13 @@ export default class CreateGroup extends Component {
      */
     stepCreate_onValidate(search) {
         return new Promise((resolve) => {
-            this.coreSocket.once("groups_checker", (data) => {
+            this.coreSocket.once("groups/checker", (data) => {
                 if (data.isGroup != undefined) {
                     this.setState({ stepCreate_isGroup: data.isGroup })
                     resolve(data.isGroup)
                 }
             })
-            this.coreSocket.emit("groups_checker", { search })
+            this.coreSocket.emit("groups/checker", { search })
         })
     }
     /**
@@ -204,7 +204,7 @@ export default class CreateGroup extends Component {
     }
     async stepInvite_onUserSearch(search) {
         return new Promise((resolve) => {
-            this.coreSocket.once("users_search", (data) => {
+            this.coreSocket.once("users/search", (data) => {
                 let uuid = duix.get("account_uuid")
                 let items = []
                 console.log(data)
@@ -218,7 +218,7 @@ export default class CreateGroup extends Component {
 
                 resolve(items)
             })
-            this.coreSocket.emit("users_search", { search })
+            this.coreSocket.emit("users/search", { search })
         })
     }
     stepInvite_onSearchRender(search, value) {
@@ -281,7 +281,8 @@ export default class CreateGroup extends Component {
             members.push(uuid)
         }
         console.log(members)
-        this.coreSocket.emit("group_create", {name: this.state.stepCreate_value, members })
+        this.coreSocket.emit("group/create", {name: this.state.stepCreate_value, members })
+        this.onClose()
     }
     // ???
     stepLaunch() {

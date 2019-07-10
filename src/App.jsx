@@ -1,16 +1,18 @@
 import React, { Component } from "react" //React itself
 import ReactDom from "react-dom" //React dom to render to the DOM
 import duix from 'duix'; //Duix is a subscrbier based state management. Think of it like event listeners.
-import { Icon, Input, Checkbox, Button, Alert, Badge, Menu, Dropdown, Avatar, Tooltip, Modal, Drawer } from "antd" //Ant Design, simple yet amazing
+import { notification, Icon, Input, Checkbox, Button, Alert, Badge, Menu, Dropdown, Avatar, Tooltip, Modal, Drawer } from "antd" //Ant Design, simple yet amazing
 //Convert to @importcore libraries on NPM
 import Grid from 'o-grid'; //Flex based grid layout, which allows perfect alignment.
 import MediaQuery from "o-mediaquery"
 import { Colors } from "o-constants"
 import io from 'socket.io-client'; //Socket client
 
+
 //Home
 import Home from "./views/home/Home"
 import Project from "./views/project/Project"
+import Notification from "./views/all/Notifications"
 
 //CSS
 import '../node_modules/antd/dist/antd.css';
@@ -20,6 +22,19 @@ duix.set('session', null);
 
 let ip = "localhost:35575"
 duix.set("ip", ip)
+
+notification.config({
+    placement: "bottomRight",
+});
+
+const openNotificationWithIcon = (type, title, message) => {
+    notification[type]({
+        message: title,
+        description: message,
+    });
+};
+
+
 
 /**
  * Viewer - Observo's hub for plugin runtime.
@@ -62,32 +77,38 @@ class App extends Component {
         }
     }
     componentDidMount() {
-        window.addEventListener("contextmenu", function(e) { e.preventDefault(); })
+        window.addEventListener("contextmenu", function (e) { e.preventDefault(); })
         this.unsub[0] = duix.subscribe("home_state", this._updateVisualState.bind(this))
         this.unsub[1] = duix.subscribe("fixed_logout", this._onLogOutStart.bind(this))
 
         this.coreSocket = io.connect(`http://${ip}/core/`)
-       
-        this.coreSocket.on("connect", () => { 
-            
+
+        this.coreSocket.on("connect", () => {
+            openNotificationWithIcon("success", "Connected", "You have connected to the server.")
+
             duix.set('home_connect', this.coreSocket); //We connected, lets set the core socket for all component to use globally
             duix.set("home_state", "ACCOUNT") //Also change the VISUAL STATE
-            this.coreSocket.emit("auth_validateKey", ({ uuid: "872571a1-0872-4e74-8b90-57df2bb75093", authKey: "7334ad56-7893-4539-ba36-a5eb74d67deb" }))
-            this.coreSocket.on("auth_valid", (data) => {
+           //this.coreSocket.emit("auth/validateKey", ({ uuid: "872571a1-0872-4e74-8b90-57df2bb75093", authKey: "7334ad56-7893-4539-ba36-a5eb74d67deb" }))
+            this.coreSocket.on("auth/valid", (data) => {
                 ///Check if we have the session
                 if (data.session != null) {
+                    duix.set('auth_disconnect', false)
                     duix.set('account_valid', true)
                     duix.set('account_uuid', data.uuid); //Set UUID Global 
                     duix.set('account_session', data.session); //Set USERs SESSION Global
                     duix.set('account_username', data.username); //Set USERs NAME Global
                     duix.set('home_setTop', 80) //Animation of the gome
                     this.coreSocket.emit("projects_getAll") //Now lets get projects
-                   
+
                     this.setState({ homeState: "PORTAL" })
-                 
+
                 }
             })
         });
+        this.coreSocket.on("disconnect", () => {
+            duix.set('auth_disconnect', true)
+            openNotificationWithIcon("error", "Disconnected", "You have disconnected from the server.")
+        })
     }
     /**
     * componentWillUnmount - React Lifecycle method. Unmount everything when needed.
@@ -139,11 +160,15 @@ class App extends Component {
             return <Project media={media} state={this.state.projectState} />
         }
     }
+    renderNotification() {
+        return <Notification />
+    }
     /////////////////////
     render() {
         return <MediaQuery>
             {media => (
                 <div>
+                    {this.renderNotification()}
                     {this.renderPages(media)}
                 </div>
             )}

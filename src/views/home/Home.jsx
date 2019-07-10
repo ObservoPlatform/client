@@ -10,7 +10,7 @@ import Fixed from "./Fixed"
 import Loading from "./Loading"
 import Account from "./Account"
 import Portal from "./Portal"
-import Messenger from "./Messenger"
+import Messenger from "../all/Messenger"
 
 /**
  * Home - The Home Screen is where all signin, group management and project selection occurs.

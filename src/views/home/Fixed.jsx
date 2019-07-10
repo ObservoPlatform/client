@@ -1,7 +1,9 @@
 import React, { Component } from "react" //React itself
 import duix from 'duix'; //Duix is a subscrbier based state management. Think of it like event listeners.
-import { Button, } from "antd" //Ant Design, simple yet amazing
-
+import { Button, notification, Badge } from "antd" //Ant Design, simple yet amazing
+notification.config({
+    placement: "bottomRight",
+});
 import Grid from "o-grid"
 /**
  * Fixed - The global component for fixed items.
@@ -13,7 +15,8 @@ export default class Fixed extends Component {
         super()
         this.unsub = []
         this.state = {
-            openMessenger: false
+            openMessenger: false,
+            notificationAmount: 0
         }
     }
     /**
@@ -21,6 +24,7 @@ export default class Fixed extends Component {
      */
     componentDidMount() {
         this.unsub[0] = duix.subscribe('home_connect', this._onConnect.bind(this));
+        this.unsub[1] = duix.subscribe('all/notifications/amount', this.notificationsAmount.bind(this));
     }
     /**
      * componentWillUnmount - Unmount Componnet, remove all subscribers
@@ -33,10 +37,10 @@ export default class Fixed extends Component {
      */
     _onConnect(client) {
         this.coreSocket = client
-        this.coreSocket.on("messenger_getNotifications", (data) => {
-            let total = message.unreadAmount
-            //TODO: Update total unread message count to button (when needed)
-        })
+        
+    }
+    notificationsAmount(amount) {
+        this.setState({notificationAmount: amount})
     }
     /////////////////////
     /**
@@ -51,6 +55,9 @@ export default class Fixed extends Component {
     onOpenMessenger() {
         duix.set("fixed_openMessenger", true)
     }
+    openNotifications() {
+        duix.set("all/notifications/open", true)
+    }
     /////////////////////
     render() {
         let translate = {}
@@ -64,7 +71,10 @@ export default class Fixed extends Component {
             <Button shape="round" icon="logout" onClick={this.onLogout.bind(this)}></Button>
         </div>)
         items.push(<div style={translate} className="fixed-right">
-            <Button shape="round" icon="message" onClick={this.onOpenMessenger.bind(this)}></Button>
+            <Grid col style={{padding: 10}}>
+                <Grid><Button shape="round" icon="message" onClick={this.onOpenMessenger.bind(this)}></Button></Grid>
+                <Grid style={{ marginLeft: 5 }}><Badge count={this.state.notificationAmount}><Button shape="round" icon="bell" onClick={this.openNotifications.bind(this)}></Button>   </Badge></Grid>
+            </Grid>
         </div>)
         items.push(this.props.media.lessThan("mobileMd") && <div style={{ height: "100%", width: "100%", zIndex: 1000, background: "gray" }} className="fixed-full">
             <Grid canvas>

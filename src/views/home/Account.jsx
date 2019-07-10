@@ -38,7 +38,7 @@ export default class Account extends Component {
     //////////////////////////////////////////////////
     _onConnect(client) {
         this.coreSocket = client
-        client.on("auth_invalidAccount", () => {
+        client.on("auth/invalidAccount", () => {
             this.setState({ invalid: true })
         })
     }
@@ -90,7 +90,7 @@ export default class Account extends Component {
      */
     onAccountSignIn() {
         if (this.state.password.length >= 5 && this.state.username.length >= 2) {
-            this.coreSocket.emit("auth_validateAccount", { username: this.state.username, password: this.state.password, remember: this.state.remember })
+            this.coreSocket.emit("auth/validateAccount", { username: this.state.username, password: this.state.password, remember: this.state.remember })
         }
     }
     //////////////////////////////////////////

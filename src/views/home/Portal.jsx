@@ -49,7 +49,7 @@ export default class Portal extends Component {
      */
     _onConnect(client) {
         this.coreSocket = client
-        this.coreSocket.on("group_projects", () => {
+        this.coreSocket.on("group/projects", () => {
             if (data.hasPropertyKey("projects")) {
                 self.setState({ projects: data.projects })
             }
@@ -95,7 +95,7 @@ export default class Portal extends Component {
         />
     }
     renderButtonSidebar() {
-        return <Grid row style={{ borderRadius: 10, padding: 8 }} width={50} height={130} background="a8a8a8">
+        return <Grid row style={{ borderRadius: 10, padding: 8 }} width={50} height={90} background="a8a8a8">
             <Grid height={40}>
                 <Tooltip title="Settings" placement="right" overlayClassName="xxxxxx">
                     <Button shape="round" icon="setting"></Button>
@@ -104,11 +104,6 @@ export default class Portal extends Component {
             <Grid height={40}>
                 <Tooltip title="Users" placement="right" overlayClassName="xxxxxx">
                     <Button shape="round" icon="user" onClick={this._showInviteSidebar.bind(this)}></Button>
-                </Tooltip>
-            </Grid>
-            <Grid height={40}>
-                <Tooltip title="Roles" placement="right" overlayClassName="xxxxxx">
-                    <Button disabled shape="round" icon="solution"></Button>
                 </Tooltip>
             </Grid>
         </Grid>
@@ -144,7 +139,7 @@ export default class Portal extends Component {
         return <Grid col style={style} height={500} className="sidebar-right-popout" background="#a8a8a8">
             <Grid row>
                 <Grid col height={62} background="#191919">
-                    <Grid><p style={{ fontSize: 24, color: "white", paddingTop: 5 }}>Users</p></Grid>
+                    <Grid><p style={{ fontSize: 24, color: "white", paddingTop: 10, marginLeft: 10 }}>Users</p></Grid>
                 </Grid>
                 <Grid row style={{ padding: 5 }}>
                     <UserSearch style={{ width: "100%" }} />
