@@ -21,13 +21,13 @@ import '../node_modules/@importcore/crust/dist/crust.css';
 duix.set('session', null);
 
 let ip = "localhost:35575"
-duix.set("ip", ip)
+duix.set("app/address", ip)
 
 notification.config({
     placement: "bottomRight",
 });
 
-const openNotificationWithIcon = (type, title, message) => {
+const openNotificationWithType = (type, title, message) => {
     notification[type]({
         message: title,
         description: message,
@@ -35,36 +35,18 @@ const openNotificationWithIcon = (type, title, message) => {
 };
 
 
-
 /**
- * Viewer - Observo's hub for plugin runtime.
- */
-class Viewer extends Component {
-    constructor() {
-        super()
-        this.unsubscribe = [];
-    }
-    componentDidMount() {
-        this.unsubscribe[0] = duix.subscribe('home_connect', this.onConnect.bind(this));
-    }
-    componentWillUnmount() {
-        for (let e in this.unsubscribe) {
-            this.unsubscribe[e]();
-        }
-    }
-    onConnect(client) {
-        this.coreSocket = client
-        this.coreSocket.on("core_validProject", (data) => {
-            this.setState({ state: "VERIFY" })
-        })
-    }
-    render() {
-        return <h1>Hi</h1>
-    }
-}
-
-/**
- * App - Main App of Observo and it runs on code
+ * App
+ * @author ImportProgram <importprogram.me>
+ * @copyright ObservoPlatform 2019
+ * 
+ * The Apps is the Control Center from Observo. It connected to the server via 
+ * /core/, setups the views for use and keeps everything in check.
+ * 
+ * SOCKET:
+ *  
+ * DUIX:
+ *  
  */
 class App extends Component {
     constructor() {
@@ -77,37 +59,41 @@ class App extends Component {
         }
     }
     componentDidMount() {
+        //Disabled RightClick (on body)
         window.addEventListener("contextmenu", function (e) { e.preventDefault(); })
-        this.unsub[0] = duix.subscribe("home_state", this._updateVisualState.bind(this))
-        this.unsub[1] = duix.subscribe("fixed_logout", this._onLogOutStart.bind(this))
 
+        //Setup Duix Subscribers
+        this.unsub[0] = duix.subscribe("home/state", this._updateVisualState.bind(this))
+        this.unsub[1] = duix.subscribe("app/logout", this._confirmLogOut.bind(this))
+
+        //Default Socket for Observo (/core/)
         this.coreSocket = io.connect(`http://${ip}/core/`)
-
+        //Connected to the server
         this.coreSocket.on("connect", () => {
-            openNotificationWithIcon("success", "Connected", "You have connected to the server.")
-
-            duix.set('home_connect', this.coreSocket); //We connected, lets set the core socket for all component to use globally
-            duix.set("home_state", "ACCOUNT") //Also change the VISUAL STATE
-           //this.coreSocket.emit("auth/validateKey", ({ uuid: "872571a1-0872-4e74-8b90-57df2bb75093", authKey: "7334ad56-7893-4539-ba36-a5eb74d67deb" }))
+            //Open Notification w/ Type
+            openNotificationWithType("success", "Connected", "You have connected to the server.")
+            duix.set('app/connect', this.coreSocket); //We connected, lets set the core socket for all component to use globally
+            duix.set("home/state", "ACCOUNT") //Also change the VISUAL STATE
+            //this.coreSocket.emit("auth/validateKey", ({ uuid: "872571a1-0872-4e74-8b90-57df2bb75093", authKey: "7334ad56-7893-4539-ba36-a5eb74d67deb" }))
             this.coreSocket.on("auth/valid", (data) => {
                 ///Check if we have the session
                 if (data.session != null) {
-                    duix.set('auth_disconnect', false)
-                    duix.set('account_valid', true)
-                    duix.set('account_uuid', data.uuid); //Set UUID Global 
-                    duix.set('account_session', data.session); //Set USERs SESSION Global
-                    duix.set('account_username', data.username); //Set USERs NAME Global
-                    duix.set('home_setTop', 80) //Animation of the gome
-                    this.coreSocket.emit("projects_getAll") //Now lets get projects
+                    duix.set('app/disconnect', false) //Reset Disconnect Status
+                    duix.set('app/account/valid', true) //Set ACCOUNT VALID
+                    duix.set('app/account/uuid', data.uuid); //Set UUID  
+                    duix.set('app/account/session', data.session); //Set SESSION
+                    duix.set('app/account/username', data.username); //Set USERNAME
+                    duix.set('home/properties/style/top', 80) //SET STYLE ANIMATION
 
+                    //Update Home State
                     this.setState({ homeState: "PORTAL" })
 
                 }
             })
         });
         this.coreSocket.on("disconnect", () => {
-            duix.set('auth_disconnect', true)
-            openNotificationWithIcon("error", "Disconnected", "You have disconnected from the server.")
+            duix.set('app/disconnect', true)
+            openNotificationWithType("error", "Disconnected", "You have disconnected from the server.")
         })
     }
     /**
@@ -134,25 +120,30 @@ class App extends Component {
         this.setState({ homeState: state })
     }
     /**
-     * _onLogOutStart - Event for when the USER ATTEMPTS to logout. 
+     * _confirmLogOut - Event for when the USER ATTEMPTS to logout. 
      * 
      * - Open Confirm Dialog to ask if they REALLY want to log out 
      */
-    _onLogOutStart(value) {
+    _confirmLogOut(value) {
         const confirm = Modal.confirm;
         if (value == true) {
             confirm({
                 title: 'Are you sure you want to logout?',
                 onOk() {
-                    duix.set("portal_logout", true)
-                    duix.set("home_state", "ACCOUNT")
+                    duix.set("app/logout", true)
+                    duix.set("home/state", "ACCOUNT")
+                    console.log("[app/logout] Logout Successful")
                 },
                 onCancel() {
-                    console.log('Cancel');
+                    console.log("[app/logout] Logout Canceled")
                 },
             });
         }
     }
+    /**
+     * renderPages - Renders a view of a page
+     * @param {} media 
+     */
     renderPages(media) {
         if (this.state.state == "HOME") {
             return <Home media={media} state={this.state.homeState} />
@@ -160,6 +151,9 @@ class App extends Component {
             return <Project media={media} state={this.state.projectState} />
         }
     }
+    /**
+     * renderNotification - Renders the Notification Drawer
+     */
     renderNotification() {
         return <Notification />
     }

@@ -10,7 +10,7 @@ export default class UserHomePanel extends Component {
     }
     render() {
         let iconSVG = null
-        let ip = duix.get("ip")
+        let ip = duix.get("app/address")
         if (ip != null) {
             iconSVG = `http://${ip}/users/icons/${this.props.uuid}`
         }

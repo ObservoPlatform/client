@@ -1,6 +1,6 @@
 import React, { Component } from "react"
 import duix from 'duix';
-import { Icon, Input, Button, Badge, Menu, Dropdown, Tooltip, Modal } from "antd"
+import { Icon, Button, Badge, Menu, Dropdown, Tooltip } from "antd"
 
 import Grid from 'o-grid';
 
@@ -13,32 +13,48 @@ import UserSearch from "../../components/inputs/UserSearch"
 
 
 /**
- * Portal - The main area for creating groups, creating/opening projects and some settings.
- * @copyright 2019 ImportCore
- * @author Brendan Fuller @ImportProgram
+ * Notifications
+ * @author ImportProgram <importprogram.me>
+ * @copyright ObservoPlatform 2019
+ * 
+ * 
+ * 
+ * The stored notifications will appear in the Notification Drawer (render here)
+ * 
+ * TODO: Work on the infinite scroll
+ * 
+ * SOCKET:
+ *  - notifications/amount #EVENT
+ *  - notifications/new #EVENT
+ *  - notifications/list #EVENT
+ * DUIX:
+ *  - app/connect #EVENT
+ *  - app/logout #EVENT 
+ *  - app/account/username #EVENT
+ *  - app/account/uuid #SET
  */
 export default class Portal extends Component {
     constructor() {
         super()
         this.unsub = [];
         this.state = {
-            username: "master",
-            uuid: null,
+            username: "master", //Username of the LOGGED IN user
+            uuid: null, //UUID of LOGGED IN user
 
-            panelState: "home",
-            groupUUID: "",
-            groupName: "Jello",
+            panelState: "home", //The Panel State. Either to show the home, or user layout, or show the group layout of projects
 
-            sidebarRightPopout: false,
+            //Handles the right sidebar of users
+            sidebarRightUsers: false,
 
+            //List of Projects (TODO: make this work)
             projects: []
 
         }
     }
     componentDidMount() {
-        this.unsub[0] = duix.subscribe('home_connect', this._onConnect.bind(this));
-        this.unsub[1] = duix.subscribe('account_username', this._onSetUsername.bind(this));
-        this.unsub[2] = duix.subscribe('account_uuid', this._onSetUUID.bind(this));
+        this.unsub[0] = duix.subscribe('app/connect', this._onConnect.bind(this));
+        this.unsub[1] = duix.subscribe('app/account/username', this._onSetUsername.bind(this));
+        this.unsub[2] = duix.subscribe('app/account/uuid', this._onSetUUID.bind(this));
 
     }
     componentWillUnmount() { for (let e in this.unsub) { this.unsub[e](); } }
@@ -48,6 +64,7 @@ export default class Portal extends Component {
      * @param {Object} client 
      */
     _onConnect(client) {
+        //Reference the Socket
         this.coreSocket = client
         this.coreSocket.on("group/projects", () => {
             if (data.hasPropertyKey("projects")) {
@@ -60,8 +77,7 @@ export default class Portal extends Component {
     * @param {Strirng} username 
     */
     _onSetUsername(username) {
-        //TODO: Uncomment
-        //this.setState({ username })
+        this.setState({ username })
     }
     /**
      * onSetUUID - Sets the uuid of the current user.
@@ -71,13 +87,13 @@ export default class Portal extends Component {
         this.setState({ uuid })
     }
     /**
-     * showPopoutSidebar - Shows sidebar from rights side (?)
+     * showPopoutSidebar - Shows sidebar from rights side 
      */
     _showPopoutSidebar() {
-        if (this.state.sidebarRightPopout) {
-            this.setState({ sidebarRightPopout: false })
+        if (this.state.sidebarRightUsers) {
+            this.setState({ sidebarRightUsers: false })
         } else {
-            this.setState({ sidebarRightPopout: true })
+            this.setState({ sidebarRightUsers: true })
         }
     }
     _showInviteSidebar() {
@@ -133,7 +149,7 @@ export default class Portal extends Component {
      */
     renderInviteUsers() {
         let style = { width: 0 }
-        if (this.state.sidebarRightPopout) {
+        if (this.state.sidebarRightUsers) {
             style = { width: 300 }
         }
         return <Grid col style={style} height={500} className="sidebar-right-popout" background="#a8a8a8">

@@ -6,9 +6,20 @@ notification.config({
 });
 import Grid from "o-grid"
 /**
- * Fixed - The global component for fixed items.
- * @copyright 2019 ImportCore
- * @author Brendan Fuller @ImportProgram 
+ * Fixed
+ * @author ImportProgram <importprogram.me>
+ * @copyright ObservoPlatform 2019
+ * 
+ * The global component for fixed items for HOME.
+ * 
+ * SOCKET:
+ *  - NONE
+ * DUIX:
+ *  - app/connect #EVENT
+ *  - app/logout #SET
+ *  - app/messenger/open #SET
+ *  - app/notifications/amount #EVENT
+ *  - app/notifications/open #SET
  */
 export default class Fixed extends Component {
     constructor() {
@@ -23,8 +34,8 @@ export default class Fixed extends Component {
      * componentDidMount - Mount Component, add the subscribers.
      */
     componentDidMount() {
-        this.unsub[0] = duix.subscribe('home_connect', this._onConnect.bind(this));
-        this.unsub[1] = duix.subscribe('all/notifications/amount', this.notificationsAmount.bind(this));
+        this.unsub[0] = duix.subscribe('app/connect', this._onConnect.bind(this));
+        this.unsub[1] = duix.subscribe('app/notifications/amount', this.notificationsAmount.bind(this));
     }
     /**
      * componentWillUnmount - Unmount Componnet, remove all subscribers
@@ -37,26 +48,26 @@ export default class Fixed extends Component {
      */
     _onConnect(client) {
         this.coreSocket = client
-        
+
     }
     notificationsAmount(amount) {
-        this.setState({notificationAmount: amount})
+        this.setState({ notificationAmount: amount })
     }
     /////////////////////
     /**
      * onLogout - When the logout floating button is pressed
      */
     onLogout() {
-        duix.set("fixed_logout", true)
+        duix.set("app/logout", true)
     }
     /**
      * onOpenMessenger - Opens the Messenger drawer for conversations
      */
     onOpenMessenger() {
-        duix.set("fixed_openMessenger", true)
+        duix.set("app/messenger/open", true)
     }
     openNotifications() {
-        duix.set("all/notifications/open", true)
+        duix.set("app/notifications/open", true)
     }
     /////////////////////
     render() {
@@ -71,7 +82,7 @@ export default class Fixed extends Component {
             <Button shape="round" icon="logout" onClick={this.onLogout.bind(this)}></Button>
         </div>)
         items.push(<div style={translate} className="fixed-right">
-            <Grid col style={{padding: 10}}>
+            <Grid col style={{ padding: 10 }}>
                 <Grid><Button shape="round" icon="message" onClick={this.onOpenMessenger.bind(this)}></Button></Grid>
                 <Grid style={{ marginLeft: 5 }}><Badge count={this.state.notificationAmount}><Button shape="round" icon="bell" onClick={this.openNotifications.bind(this)}></Button>   </Badge></Grid>
             </Grid>

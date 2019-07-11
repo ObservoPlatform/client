@@ -1,16 +1,24 @@
-import React, { Component } from "react" 
-import duix from 'duix'; 
-import { Icon, Input, Checkbox, Button, Alert } from "antd" 
+import React, { Component } from "react"
+import duix from 'duix';
+import { Icon, Input, Checkbox, Button, Alert } from "antd"
 
-import Grid from 'o-grid'; 
+import Grid from 'o-grid';
 import { Colors } from "o-constants"
 
-
 /**
- * Account - The account component is where the user will sign in to observo. 
+ * Account
+ * @author ImportProgram <importprogram.me>
+ * @copyright ObservoPlatform 2019
  * 
- * @copyright 2019 ImportCore
- * @author Brendan Fuller @ImportCore
+ *  The account component is where the user will sign in to observo. 
+ * 
+ * SOCKET:
+ *  - auth/invalid
+ *  - auth/valid
+ * DUIX:
+ *  - app/connect #EVENT
+ *  - app/logout #EVENT
+ *  - app/account/session #EVENT
  */
 export default class Account extends Component {
     constructor() {
@@ -30,15 +38,15 @@ export default class Account extends Component {
      * componentDidMount - Component Mount, subscribe to events
      */
     componentDidMount() {
-        this.unsub[0] = duix.subscribe('home_connect', this._onConnect.bind(this));
-        this.unsub[1] = duix.subscribe('portal_logout', this._onLogout.bind(this));
-        this.unsub[2] = duix.subscribe('account_session', this._onSession.bind(this));
+        this.unsub[0] = duix.subscribe('app/connect', this._onConnect.bind(this));
+        this.unsub[1] = duix.subscribe('app/logout', this._onLogout.bind(this));
+        this.unsub[2] = duix.subscribe('app/account/session', this._onSession.bind(this));
     }
     componentWillUnmount() { for (let e in this.unsub) { this.unsub[e](); } }
     //////////////////////////////////////////////////
     _onConnect(client) {
         this.coreSocket = client
-        client.on("auth/invalidAccount", () => {
+        client.on("auth/invalid", () => {
             this.setState({ invalid: true })
         })
     }

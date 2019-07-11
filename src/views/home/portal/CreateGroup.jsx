@@ -1,6 +1,6 @@
 import React, { Component } from "react"
 import duix from 'duix';
-import { Icon, Input, Button, Badge, Menu, Dropdown, Tooltip, Modal, Steps } from "antd"
+import { Button } from "antd"
 
 import Grid from 'o-grid';
 import StepModal from "../../../components/dynamic/StepModal";
@@ -12,7 +12,7 @@ import SearchChecker from "../../../components/dynamic/SearchChecker";
 //Gets the USERS Icon
 let userIcon = (uuid) => {
     //Get the IP of the client (server connected tp)
-    let ip = duix.get("ip")
+    let ip = duix.get("app/address")
     let iconSVG = null
     //Is valid?
     if (ip != null) {
@@ -36,16 +36,29 @@ let userIcon = (uuid) => {
 }
 
 /**
- * Portal - The main area for creating groups, creating/opening projects and some settings.
- * @copyright 2019 ImportCore
- * @author Brendan Fuller @ImportProgram
+ * CreateGroup [modal]
+ * @author ImportProgram <importprogram.me>
+ * @copyright ObservoPlatform 2019
+ * 
+ * The CreateGroup is the modal which is used to populate information to create a group
+ * It has a step system, where defined amount of steps are needed to continue (interactive)
+ * 
+ * SOCKET:
+ *  - users/search #EMIT
+ *  - groups/checker #EVENT #EMIT
+ *  - groups/create #EMIT
+ * 
+ * DUIX:
+ *  - app/connect #EVENT
+ *  - app/account/uuid #GET
+ * 
  */
 export default class CreateGroup extends Component {
     constructor() {
         super()
         this.unsub = [];
         this.state = {
-            current: 1,
+            current: 1, //Current Step
             steps: [
                 { title: "Name", icon: "user" },
                 { title: "Invite", icon: "usergroup-add" },
@@ -58,29 +71,43 @@ export default class CreateGroup extends Component {
             stepCreate_valueTemp: ""
         }
     }
+    /**
+     * componentDidMount - Component Mounted
+     */
     componentDidMount() {
-        this.unsub[0] = duix.subscribe('home_connect', this._onConnect.bind(this));
-
+        this.unsub[0] = duix.subscribe('app/connect', this._onConnect.bind(this));
     }
     componentWillUnmount() { for (let e in this.unsub) { this.unsub[e](); } }
-    /////////////////////
+    //////////////////////////////////
     /**
      * onConnect - When the CLIENT connects to the socket server. 
      * @param {Object} client 
      */
     _onConnect(client) {
+        //Reference the Socket
         this.coreSocket = client
     }
+    /////////////////////////////////
+    /**
+     * onNext - Event for going to the next step
+     */
     onNext() {
         if (this.state.steps.length > this.state.current) {
             let current = this.state.current + 1
             this.setState({ current })
         }
     }
+    /**
+     * onNext - Event for going to the previous step
+     */
     onBack() {
+        //Check if the state is at least greater than 1 (as 1 is default)
         if (this.state.current > 1) {
+            //Find the current step
             let current = this.state.current - 1
+            //Update the current step
             this.setState({ current })
+            //Check if the current is 1, if so, its not a group
             if (current == 1) {
                 this.setState({ stepCreate_isGroup: false })
             }
@@ -205,7 +232,7 @@ export default class CreateGroup extends Component {
     async stepInvite_onUserSearch(search) {
         return new Promise((resolve) => {
             this.coreSocket.once("users/search", (data) => {
-                let uuid = duix.get("account_uuid")
+                let uuid = duix.get("app/account/uuid")
                 let items = []
                 console.log(data)
                 for (let item in data) {
@@ -281,7 +308,7 @@ export default class CreateGroup extends Component {
             members.push(uuid)
         }
         console.log(members)
-        this.coreSocket.emit("group/create", {name: this.state.stepCreate_value, members })
+        this.coreSocket.emit("groups/create", { name: this.state.stepCreate_value, members })
         this.onClose()
     }
     // ???
@@ -292,11 +319,11 @@ export default class CreateGroup extends Component {
                 <Grid col>
                     <Grid row style={{ marginRight: 10 }}>
                         <Grid center h v style={{ textAlign: "center" }}><h1>{this.state.stepCreate_value}</h1></Grid>
-                        <Grid center h v><Button onClick={this.stepCreate_create.bind(this)} style={{ fontSize: 30, fontWeight: "bold", height: 70 }} type="primary">Create</Button></Grid>                    
+                        <Grid center h v><Button onClick={this.stepCreate_create.bind(this)} style={{ fontSize: 30, fontWeight: "bold", height: 70 }} type="primary">Create</Button></Grid>
                     </Grid>
                     <Grid width={10} style={{ borderRight: "3px solid lightgray" }} />
                     <Grid row style={{ marginLeft: 10 }} width={150}>
-                        
+
                         <Grid className="scrollY" row height={270} width={150} style={{ overflowY: 'auto', overflow: "overlay" }}>
                             {this.renderInvited(false)}
                         </Grid>
