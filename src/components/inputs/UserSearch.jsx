@@ -3,6 +3,34 @@ import React, { Component } from "react"
 import duix from 'duix';
 import Grid from 'o-grid';
 import Search, { SearchHighlight } from "../dynamic/SearchCustom";
+
+
+//Gets the USERS Icon
+let userIcon = (uuid) => {
+    //Get the IP of the client (server connected tp)
+    let ip = duix.get("app/address")
+    let iconSVG = null
+    //Is valid?
+    if (ip != null) {
+        iconSVG = `http://${ip}/users/icons/${uuid}`
+    }
+    //Fetch icon using REST API
+    if (iconSVG != null) {
+        return <Grid width={50} className="icon">
+            <div className="head-example" >
+                <img src={iconSVG} style={{ height: 42, width: 42 }} />
+            </div>
+        </Grid>
+    } else {
+        return <Grid width={50} className="icon">
+            <div className="head-example">
+                ?
+            </div>
+        </Grid>
+    }
+
+}
+
 /**
  * UserSearch - Searches users on the server and returns them via a prop callback (onSelect)
  * 
@@ -15,7 +43,7 @@ export default class UserSearch extends Component {
         this.unsub = []
     }
     componentDidMount() {
-        this.unsub[0] = duix.subscribe('home_connect', this._onConnect.bind(this), {callMeNow: true});
+        this.unsub[0] = duix.subscribe('app/connect', this._onConnect.bind(this), { callMeNow: true });
     }
     componentWillUnmount() { for (let e in this.unsub) { this.unsub[e](); } }
     /////////////////////
@@ -35,16 +63,15 @@ export default class UserSearch extends Component {
         //Create a promise as we need to get the infomation via a callback
         return new Promise((resolve) => {
             //Create the event handler to listen for the search from the server
-            this.coreSocket.once("users_search", (data) => {
+            this.coreSocket.once("users/search", (data) => {
                 //Grab the UUID of the CLIENT
-                let uuid = duix.get("account_uuid")
+                let uuid = duix.get("app/account/uuid")
                 let items = [] //All of the users
 
                 //Traverse through the data, and only push users that arent this CLIENT
                 for (let item in data) {
                     let user = data[item]
                     if (user.uuid != uuid) {
-                        console.log(user)
                         items.push(user)
                     }
                 }
@@ -52,7 +79,7 @@ export default class UserSearch extends Component {
                 resolve(items)
             })
             //Before the event above can trigger, we need to send the search to the server.
-            this.coreSocket.emit("users_search", { search })
+            this.coreSocket.emit("users/search", { search })
         })
     }
     /**
@@ -65,7 +92,6 @@ export default class UserSearch extends Component {
         let highlightSearch = (term) => {
             let words = term.toLowerCase().split(search.toLowerCase())
             let items = []
-            console.log(words)
             for (let key in words) {
                 let word = words[key]
                 items.push(word)
@@ -75,31 +101,6 @@ export default class UserSearch extends Component {
                 }
             }
             return items
-        }
-        //Gets the USERS Icon
-        let userIcon = (uuid) => {
-            //Get the IP of the client (server connected tp)
-            let ip = duix.get("ip")
-            let iconSVG = null
-            //Is valid?
-            if (ip != null) {
-                iconSVG = `http://${ip}/users/icons/${uuid}`
-            }
-            //Fetch icon using REST API
-            if (iconSVG != null) {
-                return <Grid width={50} className="icon">
-                    <div className="head-example" >
-                        <img src={iconSVG} style={{ height: 42, width: 42 }} />
-                    </div>
-                </Grid>
-            } else {
-                return <Grid width={50} className="icon">
-                    <div className="head-example">
-                        ?
-                </div>
-                </Grid>
-            }
-
         }
         //Check if no results have been found (no users)
         if (value.none) {
@@ -137,9 +138,9 @@ export default class UserSearch extends Component {
         }
     }
     render() {
-        let style= { width: 300 }
+        let style = { width: 300 }
         if (this.props.style) {
-            style={ ...style, ...this.props.style }
+            style = { ...style, ...this.props.style }
         }
         return <Search
             className="user-search"
@@ -147,7 +148,6 @@ export default class UserSearch extends Component {
             onSearch={this.onUserSearch.bind(this)}
             onRender={this.onSearchRender.bind(this)}
             onSelect={this.onSelect.bind(this)}
-            placeholder="Invite Users"
             time={300}
         />
     }

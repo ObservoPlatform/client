@@ -28,24 +28,24 @@ export default class UserHomePanel extends Component {
             </Menu>
         );
         return <Grid col>
-            <Grid col style={{ overflow: "hidden", borderRadius: 10 }} width={700} height={500} background="#a8a8a8">
+            <Grid col style={{ overflow: "hidden", borderRadius: 10 }} width={700} height={500} className="home">
                 <Grid row>
-                    <Grid col height={62} className="avatar" background="#191919">
-                        <Grid width={50} className="icon" style={{ margin: 3 }}>
+                    <Grid col height={62} className="header">
+                        <Grid width={50} className="avatar" style={{ margin: 3 }}>
                             <Dropdown overlay={menu} trigger={['contextMenu']}>
                                 <Badge status="success" >
-                                    <div className="head-example" style={{ background: "cyan" }}>
+                                    <div className="base center">
                                         <img src={iconSVG} style={{ height: 42, width: 42 }} />
                                     </div>
                                 </Badge>
                             </Dropdown>
                         </Grid>
-                        <Grid row width={100} style={{paddingLeft: 4}} >
+                        <Grid row width={100} style={{ paddingLeft: 4 }} >
                             <Grid><p style={{ fontSize: 18, color: "white", paddingTop: 8 }}>{this.props.username}</p></Grid>
                         </Grid>
                     </Grid>
-                    <Grid row>
-
+                    <Grid row className="body">
+                        Hello
                     </Grid>
                 </Grid>
             </Grid>

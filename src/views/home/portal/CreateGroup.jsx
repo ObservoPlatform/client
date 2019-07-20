@@ -4,10 +4,8 @@ import { Button } from "antd"
 
 import Grid from 'o-grid';
 import StepModal from "../../../components/dynamic/StepModal";
-import Search, { SearchHighlight } from "../../../components/dynamic/SearchCustom";
 import SearchChecker from "../../../components/dynamic/SearchChecker";
-
-
+import UserSearch from "../../../components/inputs/UserSearch";
 
 //Gets the USERS Icon
 let userIcon = (uuid) => {
@@ -117,9 +115,9 @@ export default class CreateGroup extends Component {
     ////////////////////////////
     stepCreate() {
         if (this.state.current == 1) {
-            return <Grid height={50} center h style={{ margin: 30 }}>
+            return <Grid v center h style={{ margin: 30, marginTop: -30 }}>
                 <Grid style={{ textAlign: "center" }}><h1>Name Group</h1></Grid>
-                <Grid width={300}>
+                <Grid width={300} height={15}>
                     <SearchChecker
                         value={this.state.stepCreate_value}
                         placeholder="Enter Group Name"
@@ -198,8 +196,6 @@ export default class CreateGroup extends Component {
         return items
     }
     stepInvite() {
-
-
         if (this.state.current == 2) {
             //Return the main render for the INVITE Step
             return <Grid style={{ margin: 30 }} row>
@@ -209,12 +205,10 @@ export default class CreateGroup extends Component {
                             <Grid width={180}><span style={{ fontSize: 24, fontWeight: "bold" }}> Invite Users</span></Grid>
                             <Grid width={180}> Add select users by searching for them!</Grid>
                         </Grid>
-                        <Search
+                        <UserSearch
                             style={{ width: 300 }}
-                            onSearch={this.stepInvite_onUserSearch.bind(this)}
-                            onRender={this.stepInvite_onSearchRender.bind(this)}
                             onSelect={this.stepInvite_onSelect.bind(this)}
-                            time={300}
+
                         />
                     </Grid>
                     <Grid style={{ borderRight: "3px solid lightgray" }} />
@@ -228,64 +222,6 @@ export default class CreateGroup extends Component {
         }
 
         return null
-    }
-    async stepInvite_onUserSearch(search) {
-        return new Promise((resolve) => {
-            this.coreSocket.once("users/search", (data) => {
-                let uuid = duix.get("app/account/uuid")
-                let items = []
-                console.log(data)
-                for (let item in data) {
-                    let user = data[item]
-                    if (user.uuid != uuid) {
-                        console.log(user)
-                        items.push(user)
-                    }
-                }
-
-                resolve(items)
-            })
-            this.coreSocket.emit("users/search", { search })
-        })
-    }
-    stepInvite_onSearchRender(search, value) {
-
-        //Highlights the search key word
-        let highlightSearch = (term) => {
-            let words = term.toLowerCase().split(search.toLowerCase())
-            let items = []
-            console.log(words)
-            for (let key in words) {
-                let word = words[key]
-                items.push(word)
-
-                if (key != words.length - 1) {
-                    items.push(<SearchHighlight>{search}</SearchHighlight>)
-                }
-            }
-            return items
-        }
-
-        if (value.none) {
-            let render = () => {
-                return "No Results Found"
-            }
-            return [value.username, render()]
-        } else {
-
-            let render = () => {
-                return <Grid col>
-                    <Grid width={50}>
-                        {userIcon(value.uuid)}
-                    </Grid>
-                    <Grid>
-                        {highlightSearch(value.username)}
-                    </Grid>
-                </Grid>
-            }
-            return [value.username, render()]
-        }
-
     }
     /**
      * STEP INVITE: onSelect When a user gets selected from the <Search /> Component

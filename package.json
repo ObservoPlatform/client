@@ -13,11 +13,13 @@
     "ant": "^0.2.0",
     "antd": "^3.13.0",
     "duix": "^1.0.5",
-    "react": "^16.8.6",
     "react-desktop": "^0.3.7",
     "react-dom": "^16.7.0",
     "react-draggable": "^3.3.0",
+    "react-hot-loader": "^4.12.8",
+    "react-infinite-scroll-component": "^4.5.2",
     "react-infinite-scroller": "^1.2.4",
+    "react-timeago": "^4.4.0",
     "socket.io-client": "^2.2.0",
     "store": "^2.0.12"
   },
@@ -27,6 +29,9 @@
     "o-constants": "./lib/constants.jsx"
   },
   "devDependencies": {
+    "@babel/core": "^7.5.5",
+    "babel-plugin-import": "^1.12.0",
+    "react": "^16.8.6",
     "regenerator-runtime": "^0.13.2"
   }
 }

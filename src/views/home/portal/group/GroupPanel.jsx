@@ -1,9 +1,10 @@
 import React, { Component } from "react"
+import { Icon, Button, Tooltip, } from "antd"
+
 import duix from "duix"
 import Grid from "o-grid"
 import { Colors } from "o-constants"
 
-import { Icon, Input, Button, Badge, Menu, Dropdown, Tooltip, Modal } from "antd"
 
 /**
  * GroupPanel 
@@ -62,25 +63,25 @@ export default class GroupPanel extends Component {
     render() {
         let name = this.state.groupName
         return <Grid col>
-            <Grid col style={{ overflow: "hidden", borderRadius: 10 }} width={700} height={500} background="#a8a8a8">
+            <Grid col style={{ overflow: "hidden", borderRadius: 10 }} width={700} height={500} className="group">
                 <Grid row>
-                    <Grid col height={62} className="avatar" background="#191919">
-                        <Grid width={48} className="icon">
+                    <Grid col height={62} className="header">
+                        <Grid width={48} className="avatar">
                             <Tooltip title={name} placement="left">
-                                <div className="base center">
+                                <div className="group selected center">
                                     <p style={{ color: "#fff", fontSize: 22, paddingTop: 2 }}>{name.charAt(0).toUpperCase()}</p>
                                 </div>
                             </Tooltip>
                         </Grid>
-                        <Grid row width={200} style={{ paddingLeft: 10 }} >
-                            <Grid><p style={{ fontSize: 18, color: "white", paddingTop: 7 }}>{name}</p></Grid>
+                        <Grid row width={200} style={{ paddingLeft: 15, paddingTop: 7 }} >
+                            <Grid><p style={{ fontSize: 25, color: "white", paddingTop: 2 }}>{name}</p></Grid>
                         </Grid>
                         <Grid />
-                        <Grid width={50} style={{ paddingTop: 7 }}>
+                        <Grid width={50} style={{ paddingTop: 12 }}>
                             <Button icon="plus" />
                         </Grid>
                     </Grid>
-                    <Grid row>
+                    <Grid row className="body">
                         {this.renderProjects()}
                     </Grid>
                 </Grid>

@@ -4,12 +4,10 @@ import { Icon, Button, Badge, Menu, Dropdown, Tooltip } from "antd"
 
 import Grid from 'o-grid';
 
-import GroupSidebar from "./portal/GroupSidebar"
-import UserHomePanel from "./portal/UserHomePanel"
-import GroupPanel from "./portal/GroupPanel"
-
-
-import UserSearch from "../../components/inputs/UserSearch"
+import GroupListings from "./portal/group/Listings"
+import GroupOptions from "./portal/group/Options"
+import UserHomePanel from "./portal/user/Panel"
+import GroupPanel from "./portal/group/GroupPanel"
 
 
 /**
@@ -18,10 +16,8 @@ import UserSearch from "../../components/inputs/UserSearch"
  * @copyright ObservoPlatform 2019
  * 
  * 
+ * The stored notifications will appear in the Notification Drawer (rendered here)
  * 
- * The stored notifications will appear in the Notification Drawer (render here)
- * 
- * TODO: Work on the infinite scroll
  * 
  * SOCKET:
  *  - notifications/amount #EVENT
@@ -41,10 +37,10 @@ export default class Portal extends Component {
             username: "master", //Username of the LOGGED IN user
             uuid: null, //UUID of LOGGED IN user
 
-            panelState: "home", //The Panel State. Either to show the home, or user layout, or show the group layout of projects
+            panelState: "HOME", //The Panel State. Either to show the home, or user layout, or show the group layout of projects
 
             //Handles the right sidebar of users
-            sidebarRightUsers: false,
+            GroupOptionsUsers: false,
 
             //List of Projects (TODO: make this work)
             projects: []
@@ -87,42 +83,22 @@ export default class Portal extends Component {
         this.setState({ uuid })
     }
     /**
-     * showPopoutSidebar - Shows sidebar from rights side 
+     * onUserHomeSelect - Set the view state of the panel to HOME (and duix emit too)
      */
-    _showPopoutSidebar() {
-        if (this.state.sidebarRightUsers) {
-            this.setState({ sidebarRightUsers: false })
-        } else {
-            this.setState({ sidebarRightUsers: true })
-        }
-    }
-    _showInviteSidebar() {
-        this._showPopoutSidebar(true)
-    }
-
     _onUserHomeSelect() {
-        this.setState({ panelState: "home" })
+        duix.set("home/portal/state", "HOME")
+        this.setState({ panelState: "HOME" })
+    }
+    _onGroupSelect(uuid) {
+        duix.set("home/portal/state", uuid)
+        this.setState({ panelState: uuid, projects: [] })
     }
     /////////////////////
     renderGroupSidebar() {
-        return <GroupSidebar
+        return <GroupListings
             onHomeSelect={this._onUserHomeSelect.bind(this)}
-            onGroupSelect={(uuid) => { this.setState({ panelState: uuid, projects: [] }) }}
+            onGroupSelect={this._onGroupSelect.bind(this)}
         />
-    }
-    renderButtonSidebar() {
-        return <Grid row style={{ borderRadius: 10, padding: 8 }} width={50} height={90} background="a8a8a8">
-            <Grid height={40}>
-                <Tooltip title="Settings" placement="right" overlayClassName="xxxxxx">
-                    <Button shape="round" icon="setting"></Button>
-                </Tooltip>
-            </Grid>
-            <Grid height={40}>
-                <Tooltip title="Users" placement="right" overlayClassName="xxxxxx">
-                    <Button shape="round" icon="user" onClick={this._showInviteSidebar.bind(this)}></Button>
-                </Tooltip>
-            </Grid>
-        </Grid>
     }
     renderItem() {
         const menu = (
@@ -144,28 +120,8 @@ export default class Portal extends Component {
             </Grid>
         </Dropdown>
     }
-    /**
-     * inviteUsers - Sidebar panel where you can invite users to a GROUP
-     */
-    renderInviteUsers() {
-        let style = { width: 0 }
-        if (this.state.sidebarRightUsers) {
-            style = { width: 300 }
-        }
-        return <Grid col style={style} height={500} className="sidebar-right-popout" background="#a8a8a8">
-            <Grid row>
-                <Grid col height={62} background="#191919">
-                    <Grid><p style={{ fontSize: 24, color: "white", paddingTop: 10, marginLeft: 10 }}>Users</p></Grid>
-                </Grid>
-                <Grid row style={{ padding: 5 }}>
-                    <UserSearch style={{ width: "100%" }} />
-                </Grid>
-            </Grid>
-        </Grid>
-
-    }
     renderPanel() {
-        if (this.state.panelState == "home") {
+        if (this.state.panelState == "HOME") {
             return <UserHomePanel username={this.state.username} uuid={this.state.uuid} />
         } else {
             return <GroupPanel name={this.state.name} projects={this.state.projects} />;
@@ -182,8 +138,7 @@ export default class Portal extends Component {
             <Grid width={10} />
             {this.renderPanel()}
             <Grid width={10} />
-            {this.renderButtonSidebar()}
-            {this.renderInviteUsers()}
+            <GroupOptions />
         </Grid>
     }
 }

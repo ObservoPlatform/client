@@ -1,6 +1,6 @@
 import React, { Component } from "react"
-import { Icon, Input, Button, Badge, Menu, Dropdown, Tooltip, Modal, Steps, AutoComplete, Spin } from "antd"
-import Grid from "o-grid"
+import { Icon, Input, AutoComplete, Spin } from "antd"
+
 
 const Option = AutoComplete.Option
 export default class Search extends Component {
@@ -39,14 +39,16 @@ export default class Search extends Component {
     }
     /////////////////////////////////////////
     renderSearch(object, key) {
-
+        //Default Search Render Object
         let searchRender = (key, object) => { return [object, <p>Hello World {object}</p>] }
+        //If we have a custom render, lets use that
         if (this.props.onRender) {
             searchRender = this.props.onRender
         }
+        //Outcome of the render (default or custom)
         let outcome = searchRender(this.state.search, object)
-        let text = outcome[0]
-        let jsx = outcome[1]
+        let text = outcome[0] //Grab the "search" text
+        let jsx = outcome[1] //And whatever render is being used
 
         return <Option key={key} text="">{jsx}</Option>
     }

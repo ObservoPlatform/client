@@ -2,10 +2,10 @@ import React, { Component } from "react"
 import duix from "duix"
 import Grid from "o-grid"
 import { Tooltip, Icon } from "antd"
+import classnames from "classnames"
 
 
-import homeIcon from "../../../assets/home.png"
-import CreateGroup from "./CreateGroup"
+import CreateGroup from "../CreateGroup"
 
 /**
  * GroupSidebar
@@ -99,14 +99,14 @@ export default class GroupSidebar extends Component {
      * @param {String} uuid  - UUID of Group
      */
     renderGroupItem(name, uuid) {
-        let background = "black"
-        if (uuid == this.state.selected) {
-            background = "#17c2ed"
-        }
-        return <Grid key={name} className="avatar" background="a8a8a8" height={62} style={{ padding: 5 }}>
-            <Grid width={48} className="icon" onClick={this._onGroupSelect.bind(this, name, uuid)}>
-                <Tooltip title={name} placement="left">
-                    <div className="base center" style={{ background }}>
+        return <Grid key={name} background="a8a8a8" height={62} >
+            <Grid width={48} className="avatar" onClick={this._onGroupSelect.bind(this, name, uuid)}>
+                <Tooltip title={name} placement="left" mouseLeaveDelay={-1} style={{position: "fixed"}}>
+                    <div className={classnames({
+                        selected: uuid == this.state.selected,
+                        group: true,
+                        center: true,
+                    })}>
                         <p style={{ color: "#fff", fontSize: 22, paddingTop: 2 }}>{name.charAt(0).toUpperCase()}</p>
                     </div>
                 </Tooltip>
@@ -140,10 +140,10 @@ export default class GroupSidebar extends Component {
         }
         return <Grid row width={60} height={500} style={{ overflow: "hidden", borderRadius: 10 }} className="portal">
             {this.renderCreateGroup()}
-            <Grid row height={62} className="avatar" background="#191919">
-                <Grid width={48} className="icon" onClick={this._onHomeSelect.bind(this)}>
+            <Grid row height={62} background="#191919">
+                <Grid width={48} className="avatar" onClick={this._onHomeSelect.bind(this)}>
                     <Tooltip title="Home" placement="left">
-                        <div className="base" style={{ background }}>
+                        <div className="group" style={{ background }}>
                             <p style={{ color: "#fff" }}><Icon type="home" style={{ fontSize: 20, padding: 11, color: "white" }}></Icon></p>
                         </div>
                     </Tooltip>
@@ -152,10 +152,10 @@ export default class GroupSidebar extends Component {
             <Grid row scrollY width={62} background="a8a8a8" className="group-sidebar" height={380}>
                 {this.renderGroups()}
             </Grid>
-            <Grid className="avatar" background="a8a8a8" style={{ padding: 5 }}>
-                <Grid width={48} className="icon" onClick={this._showCreateGroup.bind(this)} >
+            <Grid background="a8a8a8">
+                <Grid width={48} className="avatar" onClick={this._showCreateGroup.bind(this)} >
                     <Tooltip title="Create Group" placement="left">
-                        <div className="base" style={{ background: "black" }}>
+                        <div className="group" style={{ background: "black" }}>
                             <p style={{ color: "#fff" }}><Icon type="plus" style={{ fontSize: 20, padding: 11, color: "white" }}></Icon></p>
                         </div>
                     </Tooltip>

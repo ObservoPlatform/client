@@ -1,3 +1,6 @@
+
+import { hot } from 'react-hot-loader';
+
 import React, { Component } from "react" //React itself
 import ReactDom from "react-dom" //React dom to render to the DOM
 import duix from 'duix'; //Duix is a subscrbier based state management. Think of it like event listeners.
@@ -7,7 +10,6 @@ import Grid from 'o-grid'; //Flex based grid layout, which allows perfect alignm
 import MediaQuery from "o-mediaquery"
 import { Colors } from "o-constants"
 import io from 'socket.io-client'; //Socket client
-
 
 //Home
 import Home from "./views/home/Home"
@@ -60,7 +62,7 @@ class App extends Component {
     }
     componentDidMount() {
         //Disabled RightClick (on body)
-        window.addEventListener("contextmenu", function (e) { e.preventDefault(); })
+        //window.addEventListener("contextmenu", function (e) { e.preventDefault(); })
 
         //Setup Duix Subscribers
         this.unsub[0] = duix.subscribe("home/state", this._updateVisualState.bind(this))
@@ -74,7 +76,7 @@ class App extends Component {
             openNotificationWithType("success", "Connected", "You have connected to the server.")
             duix.set('app/connect', this.coreSocket); //We connected, lets set the core socket for all component to use globally
             duix.set("home/state", "ACCOUNT") //Also change the VISUAL STATE
-            //this.coreSocket.emit("auth/validateKey", ({ uuid: "872571a1-0872-4e74-8b90-57df2bb75093", authKey: "7334ad56-7893-4539-ba36-a5eb74d67deb" }))
+            this.coreSocket.emit("auth/validateKey", ({ uuid: "872571a1-0872-4e74-8b90-57df2bb75093", authKey: "7334ad56-7893-4539-ba36-a5eb74d67deb" }))
             this.coreSocket.on("auth/valid", (data) => {
                 ///Check if we have the session
                 if (data.session != null) {
@@ -93,6 +95,7 @@ class App extends Component {
         });
         this.coreSocket.on("disconnect", () => {
             duix.set('app/disconnect', true)
+            duix.set("home/state", "LOADING")
             openNotificationWithType("error", "Disconnected", "You have disconnected from the server.")
         })
     }
@@ -130,7 +133,7 @@ class App extends Component {
             confirm({
                 title: 'Are you sure you want to logout?',
                 onOk() {
-                    duix.set("app/logout", true)
+                    duix.set("app/logout", false)
                     duix.set("home/state", "ACCOUNT")
                     console.log("[app/logout] Logout Successful")
                 },
@@ -161,7 +164,7 @@ class App extends Component {
     render() {
         return <MediaQuery>
             {media => (
-                <div>
+                <div className="app">
                     {this.renderNotification()}
                     {this.renderPages(media)}
                 </div>
@@ -170,6 +173,4 @@ class App extends Component {
     }
 }
 
-//Render the DOM
-ReactDom.render(<App />, document.querySelector("#app"))
-
+export default hot(module)(App);
