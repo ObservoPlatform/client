@@ -133,7 +133,7 @@ export default class Account extends Component {
             style = { display: "none" }
         }
 
-        return <Grid row style={style} width={800} center h v className="account">
+        return <Grid row style={style}  center h v className="account">
             <Grid row width={400}>
                 <Grid height={50} style={{ marginBottom: 4 }}>  <Input value={this.state.username} onChange={this.onUsername.bind(this)} prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />} style={{ marginBottom: 15 }} placeholder="Username" /></Grid>
                 <Grid height={50}>  <Input value={this.state.password} onChange={this.onPassword.bind(this)} prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />} style={{ marginBottom: 15 }} placeholder="Password" /></Grid>

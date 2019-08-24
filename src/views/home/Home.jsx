@@ -65,15 +65,25 @@ export default class Home extends Component {
         if (this.props.media.greaterThan("desktopMd")) {
             top = top - 50
         }
+        let height = 300
+        if (this.props.state == "ACCOUNT") {
+            height = 500
+        } else if (this.props.state == "LOADING") {
+            height = 500
+        } else if (this.props.state == "PORTAL") {
+            height = 700
+        }
         return <Grid canvas col>
-            <Grid  row center h className="home">
-                <Fixed media={this.props.media} state={this.props.state} />
-                <Grid row width="100%" style={{ transform: `translate3d(0px , ${top}px, 0px)` }} className="area" height={300}>
-                    <Observo />
-                    <Loading state={this.props.state} />
-                    <Account state={this.props.state} />
-                    <Portal state={this.props.state} />
-                </Grid>
+            <Grid row center h v className="home">
+                <div>
+                    <Fixed media={this.props.media} state={this.props.state} />
+                    <Grid row width="100%" className="area" height={height}>
+                        <Observo />
+                        <Loading state={this.props.state} />
+                        <Account state={this.props.state} />
+                        <Portal state={this.props.state} media={this.props.media} />
+                    </Grid>
+                </div>
             </Grid>
         </Grid>
     }

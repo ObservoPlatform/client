@@ -4,21 +4,22 @@
   "description": "Observo's Client",
   "main": "main.js",
   "scripts": {
-    "start": "parcel src/index.html --out-dir ./dist"
+    "start": "parcel src/index.html --out-dir ./dist --no-autoinstall"
   },
   "author": "ImportProgram",
   "license": "MIT",
   "dependencies": {
     "@importcore/crust": "^1.0.6",
-    "ant": "^0.2.0",
     "antd": "^3.13.0",
     "duix": "^1.0.5",
+    "less": "^3.10.0",
     "react-desktop": "^0.3.7",
     "react-dom": "^16.7.0",
     "react-draggable": "^3.3.0",
     "react-hot-loader": "^4.12.8",
     "react-infinite-scroll-component": "^4.5.2",
     "react-infinite-scroller": "^1.2.4",
+    "react-markdown": "^4.1.0",
     "react-timeago": "^4.4.0",
     "socket.io-client": "^2.2.0",
     "store": "^2.0.12"
@@ -31,7 +32,7 @@
   "devDependencies": {
     "@babel/core": "^7.5.5",
     "babel-plugin-import": "^1.12.0",
-    "react": "^16.8.6",
+    "react": "^15.0.0 || ^16.0.0",
     "regenerator-runtime": "^0.13.2"
   }
 }

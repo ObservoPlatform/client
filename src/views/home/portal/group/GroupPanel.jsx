@@ -63,7 +63,7 @@ export default class GroupPanel extends Component {
     render() {
         let name = this.state.groupName
         return <Grid col>
-            <Grid col style={{ overflow: "hidden", borderRadius: 10 }} width={700} height={500} className="group">
+            <Grid col style={{ overflow: "hidden", borderRadius: 10, minWidth: "300px" }} width="40vw" height={500} className="group panel">
                 <Grid row>
                     <Grid col height={62} className="header">
                         <Grid width={48} className="avatar">

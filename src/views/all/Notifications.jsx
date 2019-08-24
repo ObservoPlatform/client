@@ -1,9 +1,12 @@
 import React, { Component } from "react"
 import duix from 'duix';
-import { Drawer, List, notification, Icon, Spin } from "antd"
+import { Drawer, List, notification, Icon, Spin, Button } from "antd"
 import InfiniteScroll from 'react-infinite-scroller';
 import TimeAgo from "react-timeago"
 import Grid from "o-grid"
+import ReactMarkdown from "react-markdown"
+
+
 /**
  * Notifications
  * @author ImportProgram <importprogram.me>
@@ -55,7 +58,7 @@ export default class Notification extends Component {
         window.addEventListener('resize', function (event) {
             self.setState({ height: (w.innerHeight || e.clientHeight || g.clientHeight) - 50 })
         });
-        let height = (w.innerHeight || e.clientHeight || g.clientHeight) - 50
+        let height = (w.innerHeight || e.clientHeight || g.clientHeight) - 60
         console.log(height)
         this.setState({ height })
     }
@@ -69,17 +72,18 @@ export default class Notification extends Component {
         let self = this
         //When a new notification arrvies
         this.coreSocket.on("notifications/push", (data) => {
-
+            console.log("notifications/push")
             //Grab the data from the server. Also give some default values if no value is passed down
             let title = data.title ? data.title : "Notification"
             let message = data.message ? data.message : "Message"
             let icon = data.icon ? data.icon : "bell"
             let color = data.color ? data.color : "black"
+            let button = data.button ? data.button : null
 
             //Now open the notification
             notification.open({
                 message: title,
-                description: message,
+                description: <ReactMarkdown source={message} />,
                 icon: <Icon type={icon} style={{ color }} />,
             })
             let messageBase = [{
@@ -87,6 +91,7 @@ export default class Notification extends Component {
                 message,
                 icon,
                 color,
+                button,
                 meta: {
                     created: Date.now()
                 }
@@ -119,7 +124,10 @@ export default class Notification extends Component {
 
     }
     //Remove all subscriptions when unmounted.
-    componentWillUnmount() { for (let e in this.unsub) { this.unsub[e](); } }
+    componentWillUnmount() {
+        for (let e in this.unsub) { this.unsub[e](); }
+        this.coreSocket.off("notifications/push")
+    }
     /**
      * openNotifications - Opens the Notifications Drawer
      */
@@ -136,7 +144,15 @@ export default class Notification extends Component {
      */
     _onLogout() {
         //Update State
-        this.setState({ openNotifications: false })
+        this.setState( {
+            height: 0,
+            lastNotification: "",
+            loading: true,
+            hasMore: true,
+            list: [],
+            page: 1,
+            openNotifications: false //Is the Notification Drawer open?
+        })
     }
     /////////////////////
     /**
@@ -158,6 +174,20 @@ export default class Notification extends Component {
         console.log("HANDLING INFINITE")
         console.log(this.state.lastNotification)
 
+    }
+    renderEvent(item) {
+        if (item.button != null) {
+            let color = item.button.color
+            let text = item.button.text
+            let event = item.button.event
+            let value = item.button.value
+            return <Grid style={{ paddingTop: 10 }}>
+                <Button onClick={() => {
+                    this.coreSocket.emit(event, value)
+                }} style={{ color: "white", background: color }}>{text}</Button>
+            </Grid>
+        }
+        return null
     }
     /////////////////////
     render() {
@@ -196,13 +226,20 @@ export default class Notification extends Component {
                                         <Icon type={item.icon} style={{ fontSize: 25, color: item.color ? item.color : "black" }} />
                                     </Grid>
                                     <Grid row>
-                                        <Grid style={{ fontWeight: "bold", fontSize: 20 }}>{item.title}</Grid>
-                                        <Grid style={{ paddingTop: 5 }}>{item.message}</Grid>
+                                        <Grid col>
+                                            <Grid width={270} style={{ fontWeight: "bold", fontSize: 20 }}>
+                                                {item.title}
+                                            </Grid>
+                                            <Grid width={110}>
+                                                <TimeAgo live={this.state.openNotifications} date={item.meta.created} />
+                                            </Grid>
+                                        </Grid>
+                                        <Grid style={{ paddingTop: 5 }}>
+                                            <ReactMarkdown source={item.message} />
+                                        </Grid>
+                                        {this.renderEvent(item)}
                                     </Grid>
-                                    <Grid>
-                                        
-                                        <TimeAgo live={this.state.openNotifications} date={item.meta.created} />
-                                    </Grid>
+
                                 </Grid>
                             </List.Item>
                         )}

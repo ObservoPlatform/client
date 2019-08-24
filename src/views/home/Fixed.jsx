@@ -65,17 +65,19 @@ export default class Fixed extends Component {
      */
     onOpenMessenger() {
         duix.set("app/messenger/open", true)
+        console.log("Say")
+        this.coreSocket.emit("notifications/dummy")
     }
     openNotifications() {
         duix.set("app/notifications/open", true)
     }
     /////////////////////
     render() {
-        let translate = {}
+        let translate = { height: 100 }
         //Check the VISUAL STATE
         if (this.props.state == "PORTAL") {
             //If the visual state is portal, lets move the items into frame, but animating them from the sides.
-            translate = { transform: "translate(0px)" }
+            translate = { transform: "translate(0px)", height: 100 }
         }
         let items = []
         items.push(<div style={translate} className="fixed-left">
@@ -85,15 +87,6 @@ export default class Fixed extends Component {
             <Grid col style={{ padding: 10 }}>
                 <Grid><Button shape="round" icon="message" onClick={this.onOpenMessenger.bind(this)}></Button></Grid>
                 <Grid style={{ marginLeft: 5 }}><Badge count={this.state.notificationAmount}><Button shape="round" icon="bell" onClick={this.openNotifications.bind(this)}></Button>   </Badge></Grid>
-            </Grid>
-        </div>)
-        items.push(this.props.media.lessThan("mobileMd") && <div style={{ height: "100%", width: "100%", zIndex: 1000, background: "gray" }} className="fixed-full">
-            <Grid canvas>
-                <Grid row center h v className="account">
-                    <Grid row>
-                        <p style={{ fontSize: 40, fontWeight: "bold", textAlign: "center", width: "100%" }} className="text">This is too small</p>
-                    </Grid>
-                </Grid>
             </Grid>
         </div>)
         //Return the array of items back.

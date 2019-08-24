@@ -76,7 +76,7 @@ class App extends Component {
             openNotificationWithType("success", "Connected", "You have connected to the server.")
             duix.set('app/connect', this.coreSocket); //We connected, lets set the core socket for all component to use globally
             duix.set("home/state", "ACCOUNT") //Also change the VISUAL STATE
-            this.coreSocket.emit("auth/validateKey", ({ uuid: "872571a1-0872-4e74-8b90-57df2bb75093", authKey: "7334ad56-7893-4539-ba36-a5eb74d67deb" }))
+            //this.coreSocket.emit("auth/validateKey", ({ uuid: "872571a1-0872-4e74-8b90-57df2bb75093", authKey: "7334ad56-7893-4539-ba36-a5eb74d67deb" }))
             this.coreSocket.on("auth/valid", (data) => {
                 ///Check if we have the session
                 if (data.session != null) {
@@ -129,11 +129,13 @@ class App extends Component {
      */
     _confirmLogOut(value) {
         const confirm = Modal.confirm;
+        let self = this
         if (value == true) {
             confirm({
                 title: 'Are you sure you want to logout?',
                 onOk() {
                     duix.set("app/logout", false)
+                    self.coreSocket.emit("auth/logout")
                     duix.set("home/state", "ACCOUNT")
                     console.log("[app/logout] Logout Successful")
                 },

@@ -127,7 +127,7 @@ export default class GroupSettings extends React.Component {
             //Get all information of the properties
             let icon = props.icon ? props.icon : "close"
             let name = props.name ? props.name : "Default"
-            let select = props.select ? true : false
+            let select = name.toUpperCase() == this.state.panel ? true : false
             //Render
             return <Grid onClick={props.onClick} col height={30} className={classnames({ group: true, selected: select })} style={{ padding: "20 10" }}>
                 <Grid height={30} style={{ marginTop: 8 }}><Icon style={{ fontSize: '30px' }} type={icon} /></Grid>
@@ -155,7 +155,7 @@ export default class GroupSettings extends React.Component {
             </Grid>
             <Grid col className="body">
                 <Grid width={200} height="100%" className="sidebar" center h>
-                    <SettingsGroup onClick={this._onPanelSelect.bind(this, "OVERVIEW")} select name="Overview" icon="setting" />
+                    <SettingsGroup onClick={this._onPanelSelect.bind(this, "OVERVIEW")} name="Overview" icon="setting" />
                     <SettingsGroup onClick={this._onPanelSelect.bind(this, "USERS")} name="Users" icon="team" />
                 </Grid>
                 <Grid width={10} background="white" />
